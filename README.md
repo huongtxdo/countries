@@ -23,7 +23,7 @@ npm install
 npm start
 ```
 
-A seperate API key with OpenWeather is required. Upon getting the key, you can set it in your process environemtn variables:
+A seperate API key with <a href="https://home.openweathermap.org/users/sign_up">OpenWeather</a> is required. Upon getting the key, you can set it in your process environemtn variables:
 
 ```
 process.env.REACT_APP_API_KEY
