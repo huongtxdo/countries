@@ -1,21 +1,23 @@
+import { Button } from '@mui/material'
+
 const Language = (props) => {
-  const { languages } = props;
-  const languagesValue = Object.values(languages);
+  const { languages } = props
+  const languagesValue = Object.values(languages)
   return (
     <ul>
       {languagesValue.map((value) => (
         <li key={value}>{value}</li>
       ))}
     </ul>
-  );
-};
+  )
+}
 
-export const Flag = ({flags, name, flagWidth}) => {
-  return <img src={flags.svg} style={{ width: flagWidth }} alt={name} />;
-};
+export const Flag = ({ flags, name, flagWidth }) => {
+  return <img src={flags.svg} style={{ width: flagWidth }} alt={name} />
+}
 
 const Weather = ({ weather }) => {
-  const src = `http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`;
+  const src = `http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`
   return (
     <div>
       temperature {(weather.main.temp - 273.15).toFixed(2)} Celsius
@@ -24,25 +26,41 @@ const Weather = ({ weather }) => {
       <br />
       wind {weather.wind.speed} m/s
     </div>
-  );
-};
+  )
+}
 
-const Country = (props) => {
-  const { name, capital, area, languages, flags, weather } = props;
+const Country = ({
+  name,
+  capital,
+  area,
+  languages,
+  flags,
+  weather,
+  backButton,
+}) => {
   const flagWidth = 200
   return (
     <div>
       <h1>{name}</h1>
-      capitlal {capital} <br />
-      area {area} <br />
+      Capitlal: {capital} <br />
+      Area: {area} <br />
       <br />
-      <h2>languages:</h2>
+      <h2>Languages:</h2>
       <Language languages={languages} />
-      <Flag flags={flags} name={name} flagWidth={flagWidth}/>
+      <Flag flags={flags} name={name} flagWidth={flagWidth} />
       <h2>Weather in {capital}</h2>
       {weather ? <Weather capital={capital} weather={weather} /> : null}
+      <Button
+        onClick={() => backButton()}
+        variant="contained"
+        sx={{ mt: 2 }}
+        size="small"
+      >
+        Back to list
+      </Button>
     </div>
-  );
-};
+  )
+}
 
-export default Country;
+export default Country
+
