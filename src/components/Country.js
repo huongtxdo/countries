@@ -48,7 +48,7 @@ const Country = ({
       <h2>Languages:</h2>
       <Language languages={languages} />
       <Flag flags={flags} name={name} flagWidth={flagWidth} />
-      <h2>Weather in {capital}</h2>
+      <h2>Weather in {capital ? capital : name}</h2>
       {weather ? <Weather capital={capital} weather={weather} /> : null}
       <Button
         onClick={() => backButton()}
