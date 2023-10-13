@@ -2,14 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 
-import {
-  AppBar,
-  Box,
-  Container,
-  Toolbar,
-  Typography,
-  Button,
-} from '@mui/material'
+import { AppBar, Container, Toolbar, Typography, Button } from '@mui/material'
 
 import CapitalQuiz from './components/CapitalQuiz'
 import HomePage from './components/CountrySearch'

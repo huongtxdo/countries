@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { Box, Typography } from '@mui/material'
 
@@ -12,6 +13,14 @@ const HomePage = ({ countries }) => {
   const [showCountries, setShowCountries] = useState(true) // checker for Countries-component
   const [searchCountries, setSearchCountries] = useState([])
   const [weather, setWeather] = useState(null)
+
+  const location = useLocation()
+  useEffect(() => {
+    setSearchName('')
+    setSearchCountries([])
+    setOneCountry(null)
+    setWeather(null)
+  }, [location])
 
   const handleWeather = (country) => {
     const api_key = process.env.REACT_APP_API_KEY
