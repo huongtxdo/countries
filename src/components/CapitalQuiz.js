@@ -2,12 +2,14 @@ import lodash from 'lodash'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-import { Typography, Box, Grid, Button, Alert } from '@mui/material'
+import { Typography, Box, Grid, Button, Alert, Slider } from '@mui/material'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import Notification from './Notification'
+import QuizButtons from './QuizButtons'
 
 const CapitalQuiz = ({ countries }) => {
+  const [difficulty, setDifficulty] = useState(2)
   const [subCountries, setSubCountries] = useState([])
   const [country, setCountry] = useState([])
   const [capital, setCapital] = useState([])
@@ -16,13 +18,15 @@ const CapitalQuiz = ({ countries }) => {
   const [win, setWin] = useState(false)
 
   // states for notifications
-  const [errorMessage, setErrorMessage] = useState(false)
-  const [message, setMessage] = useState(null)
+  const [severity, setSeverity] = useState('info')
+  const [message, setMessage] = useState(
+    'Select the correct capital for each country'
+  )
 
   // states for re-rendering the page when clicking on the Quiz button on nav bar
   const location = useLocation()
   useEffect(() => {
-    setSubCountries(lodash.sampleSize(countries, 2))
+    setSubCountries(lodash.sampleSize(countries, difficulty))
     setCountry([])
     setCapital([])
     setSelectedCountry(null)
@@ -30,17 +34,17 @@ const CapitalQuiz = ({ countries }) => {
     setWin(false)
   }, [countries, location])
 
-  // function for changing message and errorMessage
-  const notiChange = (message, errorMessage) => {
+  // function for changing message and severity
+  const notiChange = (message, severity) => {
     var timer
     const startTimer = () =>
       (timer = setTimeout(() => {
-        setMessage(null)
-        setErrorMessage(false)
+        setMessage('Select the correct capital for each country')
+        setSeverity('info')
       }, 3000))
 
     setMessage(message)
-    setErrorMessage(errorMessage)
+    setSeverity(severity)
 
     clearTimeout(timer)
     startTimer()
@@ -49,9 +53,9 @@ const CapitalQuiz = ({ countries }) => {
   // initializing random countries array
   useEffect(() => {
     if (countries) {
-      setSubCountries(lodash.sampleSize(countries, 2))
+      setSubCountries(lodash.sampleSize(countries, difficulty))
     }
-  }, [countries])
+  }, [countries, difficulty])
 
   // initializing country and capital array
   useEffect(() => {
@@ -78,19 +82,19 @@ const CapitalQuiz = ({ countries }) => {
         ? countryFromSubCountries.capital[0]
         : countryFromSubCountries.name.common
       if (selectedCapital === correctCapital) {
-        const updatedSubCountries = subCountries.filter(
-          (country) => country.name.common !== selectedCountry
-        )
+        const updatedCountryList = country.filter((c) => c !== selectedCountry)
+        const updatedCapitalList = capital.filter((c) => c !== selectedCapital)
         notiChange(
           `Correct! ${selectedCapital} is the capital of ${selectedCountry}.`,
-          false
+          'success'
         )
-        if (updatedSubCountries.length === 0) setWin(true)
-        setSubCountries(updatedSubCountries)
+        if (updatedCountryList.length === 0) setWin(true)
+        setCountry(updatedCountryList)
+        setCapital(updatedCapitalList)
       } else {
         notiChange(
           `${selectedCapital} is not the capital of ${selectedCountry}.`,
-          true
+          'error'
         )
       }
       setSelectedCapital(null)
@@ -107,42 +111,45 @@ const CapitalQuiz = ({ countries }) => {
     flexDirection: 'column',
   }
 
+  const renderWinPage = () => (
+    <Box sx={boxSx}>
+      <Notification message={message} severity={severity} />
+      <Alert severity="success" sx={{ marginTop: 3 }}>
+        <strong>Well done!</strong>
+      </Alert>
+      <Typography variant="h6">Difficulty?</Typography>
+      <Slider
+        aria-label="difficulty"
+        onChange={({ target }) => setDifficulty(Number(target.value))}
+        value={difficulty}
+        valueLabelDisplay="auto"
+        marks
+        step={1}
+        min={2}
+        max={15}
+      />
+      <Button
+        onClick={() => {
+          setMessage('Select the correct capital for each country')
+          setSeverity('info')
+          setSubCountries(lodash.sampleSize(countries, difficulty))
+          setWin(false)
+        }}
+      >
+        New round
+      </Button>
+    </Box>
+  )
+
   if (!subCountries || !country || !capital) return <></>
-  if (win) {
-    return (
-      <Box sx={boxSx}>
-        <Notification message={message} errorMessage={errorMessage} />
-        <Alert severity="success" sx={{ marginTop: 3 }}>
-          <strong>Well done!</strong>
-        </Alert>
-        <Button
-          onClick={() => {
-            setMessage(null)
-            setErrorMessage(false)
-            setSubCountries(lodash.sampleSize(countries, 2))
-            setWin(false)
-          }}
-        >
-          New round?
-        </Button>
-      </Box>
-    )
-  }
-
-  const countryClicked = (newCountry) => {
-    setSelectedCountry(newCountry)
-  }
-
-  const capitalClicked = (newCapital) => {
-    setSelectedCapital(newCapital)
-  }
+  if (win) return renderWinPage()
 
   return (
     <Box sx={boxSx}>
-      <Notification message={message} errorMessage={errorMessage} />
-      <Typography component="h1" variant="h4" sx={{ marginBottom: 3 }}>
+      <Typography component="h1" variant="h4" sx={{ marginBottom: 1 }}>
         Country capital quiz
       </Typography>
+      <Notification message={message} severity={severity} />
       <Grid
         container
         direction="row"
@@ -152,50 +159,22 @@ const CapitalQuiz = ({ countries }) => {
       >
         <ThemeProvider theme={theme}>
           <Grid item xs={6}>
-            <Grid container rowSpacing={1}>
-              {country &&
-                country.map((name) => (
-                  <Grid key={name} item xs={12}>
-                    <Button
-                      key={name}
-                      onClick={() => countryClicked(name)}
-                      variant="contained"
-                      sx={{
-                        backgroundColor:
-                          selectedCountry === name
-                            ? 'countryMain'
-                            : 'countryLight',
-                        color: 'black',
-                      }}
-                    >
-                      {name}
-                    </Button>
-                  </Grid>
-                ))}
-            </Grid>
+            <QuizButtons
+              countryOrCapital={country}
+              selected={selectedCountry}
+              setSelected={setSelectedCountry}
+              mainColor={'countryMain'}
+              lightColor={'countryLight'}
+            />
           </Grid>
           <Grid item xs={6} align="right">
-            <Grid container rowSpacing={1}>
-              {capital &&
-                capital.map((capital) => (
-                  <Grid key={capital} item xs={12}>
-                    <Button
-                      key={capital}
-                      onClick={() => capitalClicked(capital)}
-                      variant="contained"
-                      sx={{
-                        backgroundColor:
-                          selectedCapital === capital
-                            ? 'capitalMain'
-                            : 'capitalLight',
-                        color: 'black',
-                      }}
-                    >
-                      {capital}
-                    </Button>
-                  </Grid>
-                ))}
-            </Grid>
+            <QuizButtons
+              countryOrCapital={capital}
+              selected={selectedCapital}
+              setSelected={setSelectedCapital}
+              mainColor={'capitalMain'}
+              lightColor={'capitalLight'}
+            />
           </Grid>
         </ThemeProvider>
       </Grid>

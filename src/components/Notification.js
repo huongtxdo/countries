@@ -1,47 +1,12 @@
 import { Alert } from '@mui/material'
 
-// import { Row, Col } from 'react-bootstrap'
-
-// import { useNotiValue } from '../contexts/NotiContext'
-
-// const Notification = () => {
-//   const notification = useNotiValue()
-//   const bootstrapClass = (() => {
-//     switch (notification.notiType) {
-//       case 'notification':
-//       case 'logoutNoti':
-//         return 'alert alert-success'
-//       case 'error':
-//         return 'alert alert-warning'
-//       default:
-//         return ''
-//     }
-//   })()
-
-//   if (notification.notiType === 'logoutNoti') {
-//     return (
-//       <Row className="justify-content-center">
-//         <Col xs={12} md={6}>
-//           <div className={bootstrapClass} role="alert">
-//             {notification.notiMsg}
-//           </div>
-//         </Col>
-//       </Row>
-//     )
-//   }
-
-//   return (
-//     <div className={bootstrapClass} role="alert">
-//       {notification.notiMsg}
-//     </div>
-//   )
-// }
-
-const Notification = ({ message, errorMessage }) =>
-  message && (
-    <Alert variant="outlined" severity={errorMessage ? 'error' : 'success'}>
+const Notification = ({ message, severity }) =>
+  message ? (
+    <Alert variant="outlined" severity={severity} style={{ marginBottom: 5 }}>
       {message}
     </Alert>
+  ) : (
+    <div style={{ height: 48, marginBottom: 5 }}></div>
   )
 
 export default Notification
